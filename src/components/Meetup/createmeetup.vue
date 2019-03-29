@@ -2,7 +2,7 @@
     <div>
         <v-container>
             <v-layout row>
-                <v-flex xs12>
+                <v-flex xs12 sm6 offset-3>
                     <h2>Create Meetups</h2>
                 </v-flex>
             </v-layout>

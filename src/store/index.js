@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+// import auth from '@/fb'
+import * as firebase from 'firebase'
 
 Vue.use(Vuex)
 
@@ -12,13 +13,16 @@ export const store = new Vuex.Store({
             {src:require('@/assets/slide3.jpg'), id:'ret465wgdsd7f', title:'Meetup in Bing', date:'2017-09-20'}
         ],
         user : {
-            id : 'qwer123',
-            registeredMeetups : ['qwqewrwer23we']
+            id : null
         }
     },
     mutations :{
         createMeetup (state,payload){
             state.loadedMeetups.push(payload)
+        },
+
+        setUser (state, payload) {
+            state.user = payload
         }
     },
     actions:{
@@ -34,6 +38,39 @@ export const store = new Vuex.Store({
             }
 
             commit('createMeetup', meetup)
+        },
+
+        signUserUp({commit}, payload){
+            firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+            .then(user => {
+                const newUser ={
+                    id : user.uid,
+                    registeredMeetups : []
+                }
+                commit('setUser', newUser)
+            })
+            .catch((err) => {
+                console.log(err.message)
+            })
+        },
+
+        signUserIn({commit}, payload){
+            firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
+            .then(user=>{
+                const newUser = {
+                    id : user.uid,
+                    registeredMeetups : []
+                }
+                commit('setUser', newUser)
+            })
+            .catch(err=>{
+                console.log(err.message)
+            })
+        },
+
+        user (state) {
+            console.log(state)
+            return state.user
         }
     },
     getters:{
@@ -42,7 +79,7 @@ export const store = new Vuex.Store({
                 return meetA.date > meetB.date
             })
         },
-        featuredMeetups (state, getters){
+        featuredMeetups (getters){
             return getters.loadedMeetups.slice(0,5)
         },
         loadedMeetup (state) {
